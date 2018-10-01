@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Discovery.Contracts
+namespace Elders.Discovery
 {
     public class DiscoveryReaderResponseModel
     {

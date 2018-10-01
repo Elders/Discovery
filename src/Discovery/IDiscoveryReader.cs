@@ -1,4 +1,4 @@
-﻿namespace Discovery.Contracts
+﻿namespace Elders.Discovery
 {
     public interface IDiscoveryReader
     {

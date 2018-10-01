@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Discovery.Contracts
+namespace Elders.Discovery
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
     public class DiscoverableAttribute : Attribute

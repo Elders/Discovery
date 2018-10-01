@@ -1,8 +1,7 @@
 ﻿using System;
-using Discovery.Contracts;
 using Machine.Specifications;
 
-namespace Discovery.Tests
+namespace Elders.Discovery.Tests
 {
     public class When_comparing_two_equal__DiscoverableEndpoint__
     {

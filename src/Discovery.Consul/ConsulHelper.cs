@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Discovery.Consul
+namespace Elders.Discovery.Consul
 {
     public static class ConsulHelper
     {

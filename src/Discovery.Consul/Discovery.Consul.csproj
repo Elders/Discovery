@@ -1,33 +1,62 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFrameworks>net45;net461</TargetFrameworks>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
+  </PropertyGroup>
 
-    <!--Nuget-->
-    <PropertyGroup>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <PackageId>Discovery.Consul</PackageId>
-        <PackageLicenseUrl>https://github.com/Elders/Discovery/blob/master/LICENSE</PackageLicenseUrl>
-        <PackageProjectUrl>https://github.com/Elders/Discovery</PackageProjectUrl>
-        <PackageTags>discovery</PackageTags>
-        <RepositoryUrl>https://github.com/Elders/Discovery</RepositoryUrl>
-        <RepositoryType>Framework</RepositoryType>
-        <Authors>Elders</Authors>
-    </PropertyGroup>
+  <!--Nuget-->
+  <PropertyGroup>
+    <PackageId>Discovery.Consul</PackageId>
+    <Product>Discovery</Product>
+    <Title>Discovery</Title>
+    <Authors>Elders OSS</Authors>
+    <Copyright>Copyright © Elders OSS 2013</Copyright>
+    <Description>Discovery</Description>
+    <PackageTags>discovery</PackageTags>
+    <PackageLicenseUrl>https://github.com/Elders/Discovery/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Elders/Discovery</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Elders/Discovery.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>Elders.Discovery.Consul</AssemblyName>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <RootNamespace>Elders.Discovery.Consul</RootNamespace>
+  </PropertyGroup>
 
-    <!--net45-->
-    <PropertyGroup>
-        <DefineConstants>TRACE;DEBUG</DefineConstants>
-    </PropertyGroup>
-    <ItemGroup>
-        <Reference Include="mscorlib" />
-        <Reference Include="System" />
-        <Reference Include="System.Core" />
-        <Reference Include="Microsoft.CSharp" />
-        <PackageReference Include="Consul" Version="0.7.2.4" />
-        <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.4" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\Discovery\Discovery.csproj" />
-    </ItemGroup>
+  <!--netstandard2.0-->
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+  </ItemGroup>
+
+  <!--net472-->
+  <PropertyGroup Condition="'$(TargetFramework)'=='net472'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='net472'">
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Consul" Version="0.7.2.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Discovery\Discovery.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <EmbedSources>true</EmbedSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.3" PrivateAssets="all">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

@@ -1,12 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Web.Http;
 using Consul;
-using Discovery.Contracts;
 
-namespace Discovery.Consul
+namespace Elders.Discovery.Consul
 {
     public class ConsulRegistrationService
     {
@@ -23,20 +20,10 @@ namespace Discovery.Consul
             if (string.IsNullOrEmpty(consulNodeIp) == true) throw new ArgumentNullException(nameof(consulNodeIp));
         }
 
-        public void RegisterServices(HttpConfiguration config, Assembly assembly, string boundedContext, Uri boundedContextBaseUri)
+        public void RegisterServices(IEnumerable<DiscoverableEndpoint> endpoints)
         {
-            var methodsWithDiscoverableAttribute = assembly.GetTypes()
-              .SelectMany(t => t.GetMethods())
-              .Where(m => m.GetCustomAttributes(typeof(DiscoverableAttribute), false).Length > 0)
-              .Select(m => new { Method = m, Attr = (DiscoverableAttribute)m.GetCustomAttribute(typeof(DiscoverableAttribute), false) })
-              .ToArray();
-
-            foreach (var methodWithDiscoverableAttribute in methodsWithDiscoverableAttribute)
+            foreach (var endpoint in endpoints)
             {
-                var method = methodWithDiscoverableAttribute.Method;
-                var attr = methodWithDiscoverableAttribute.Attr;
-
-                var endpoint = new DiscoverableEndpoint(attr.EndpointName, new Uri(boundedContextBaseUri, GetUrl(config, method)), boundedContext, new DiscoveryVersion(attr.Version, attr.DepricateVersion));
                 AppendToConsul(endpoint);
             }
         }
@@ -163,15 +150,6 @@ namespace Discovery.Consul
 
             var ip = clientAddrCfg.Value;
             return ip;
-        }
-
-        static string GetUrl(HttpConfiguration config, MethodInfo method)
-        {
-            return config
-                   .Services
-                   .GetApiExplorer()
-                   .ApiDescriptions.Where(x => x.ActionDescriptor.ActionName == method.Name && x.ActionDescriptor.ControllerDescriptor.ControllerType == method.DeclaringType && x.HttpMethod != HttpMethod.Head)
-                   .Single().Route.RouteTemplate;
         }
     }
 }
