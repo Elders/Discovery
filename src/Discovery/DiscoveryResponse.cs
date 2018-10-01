@@ -2,14 +2,14 @@
 
 namespace Elders.Discovery
 {
-    public class DiscoveryReaderResponseModel
+    public class DiscoveryResponse
     {
-        DiscoveryReaderResponseModel()
+        DiscoveryResponse()
         {
             Endpoints = new List<DiscoverableEndpoint>();
         }
 
-        public DiscoveryReaderResponseModel(long updatedAt, IEnumerable<DiscoverableEndpoint> endpoints)
+        public DiscoveryResponse(long updatedAt, IEnumerable<DiscoverableEndpoint> endpoints)
         {
             UpdatedAt = updatedAt;
             Endpoints = new HashSet<DiscoverableEndpoint>(endpoints);
