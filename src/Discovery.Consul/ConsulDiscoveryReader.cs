@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Consul;
 
 namespace Elders.Discovery.Consul
@@ -15,21 +16,31 @@ namespace Elders.Discovery.Consul
             this.client = client;
         }
 
-        public DiscoveryReaderResponseModel Get()
+        public DiscoveryResponse Get()
         {
             return Get(string.Empty);
         }
 
-        public DiscoveryReaderResponseModel Get(string boundedContext)
+        public Task<DiscoveryResponse> GetAsync()
+        {
+            return GetAsync(string.Empty);
+        }
+
+        public DiscoveryResponse Get(string boundedContext)
+        {
+            return GetAsync(boundedContext).Result;
+        }
+
+        public async Task<DiscoveryResponse> GetAsync(string boundedContext)
         {
             long globalUpdatedAt = 0;
             var foundEndpoints = new HashSet<DiscoverableEndpoint>();
 
-            var result = client.Catalog.Services().Result;
-            if (ReferenceEquals(null, result) == true || result.StatusCode != System.Net.HttpStatusCode.OK)
-                return new DiscoveryReaderResponseModel(globalUpdatedAt, foundEndpoints);
+            var result = await client.Catalog.Services().ConfigureAwait(false);
+            if (ReferenceEquals(null, result) || result.StatusCode != System.Net.HttpStatusCode.OK)
+                return new DiscoveryResponse(globalUpdatedAt, foundEndpoints);
 
-            var publicServices = result.Response.Where(x => x.Value.Any(y => ConsulHelper.IsPublic(y) == true));
+            var publicServices = result.Response.Where(x => x.Value.Any(y => ConsulHelper.IsPublic(y)));
 
             foreach (var publicService in publicServices)
             {
@@ -39,23 +50,23 @@ namespace Elders.Discovery.Consul
 
                 DiscoverableEndpoint consulEndpoint = publicService.Value.ConvertConsulTagsToDiscoveryEndpoint();
                 foundEndpoints.Add(consulEndpoint);
-                long serviceUpdatedAt = GetServiceUpdatedAt(publicService.Key);
+                long serviceUpdatedAt = await GetServiceUpdatedAtAsync(publicService.Key).ConfigureAwait(false);
                 if (serviceUpdatedAt > globalUpdatedAt)
                     globalUpdatedAt = serviceUpdatedAt;
             }
 
-            return new DiscoveryReaderResponseModel(globalUpdatedAt, foundEndpoints);
+            return new DiscoveryResponse(globalUpdatedAt, foundEndpoints);
         }
 
-        private long GetServiceUpdatedAt(string serviceId)
+        private async Task<long> GetServiceUpdatedAtAsync(string serviceId)
         {
             var endpointsFromAllNodes = new HashSet<DiscoverableEndpoint>();
 
             long updatedAt = 0;
-            var consulServiceResponse = client.Catalog.Service(serviceId).Result;
-            if (ReferenceEquals(null, consulServiceResponse) == false && consulServiceResponse.StatusCode == System.Net.HttpStatusCode.OK)
+            var result = await client.Catalog.Service(serviceId).ConfigureAwait(false);
+            if (ReferenceEquals(null, result) == false && result.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                CatalogService[] currentServices = consulServiceResponse.Response;
+                CatalogService[] currentServices = result.Response;
                 if (ReferenceEquals(null, currentServices) == false)
                 {
                     foreach (var currentService in currentServices)

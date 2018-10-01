@@ -1,9 +1,13 @@
-﻿namespace Elders.Discovery
+﻿using System.Threading.Tasks;
+
+namespace Elders.Discovery
 {
     public interface IDiscoveryReader
     {
-        DiscoveryReaderResponseModel Get();
+        DiscoveryResponse Get();
+        DiscoveryResponse Get(string boundedContext);
 
-        DiscoveryReaderResponseModel Get(string boundedContext);
+        Task<DiscoveryResponse> GetAsync();
+        Task<DiscoveryResponse> GetAsync(string boundedContext);
     }
 }
