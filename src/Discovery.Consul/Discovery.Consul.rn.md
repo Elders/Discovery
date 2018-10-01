@@ -1,6 +1,7 @@
 #### 0.2.5 - 15.10.2018
 * Fixes internal behaviour of ConsulRegistrationService
 
+
 #### 0.2.4 - 21.05.2018
 * Properly calculates UpdatedAt field when getting all services
 
