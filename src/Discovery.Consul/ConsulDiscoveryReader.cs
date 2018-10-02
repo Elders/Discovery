@@ -16,19 +16,9 @@ namespace Elders.Discovery.Consul
             this.client = client;
         }
 
-        public DiscoveryResponse Get()
-        {
-            return Get(string.Empty);
-        }
-
         public Task<DiscoveryResponse> GetAsync()
         {
             return GetAsync(string.Empty);
-        }
-
-        public DiscoveryResponse Get(string boundedContext)
-        {
-            return GetAsync(boundedContext).Result;
         }
 
         public async Task<DiscoveryResponse> GetAsync(string boundedContext)

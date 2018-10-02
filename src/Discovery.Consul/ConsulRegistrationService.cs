@@ -1,39 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Consul;
 
 namespace Elders.Discovery.Consul
 {
     public class ConsulRegistrationService
     {
-        readonly ConsulClient client;
+        private readonly ConsulClient client;
+        private readonly IEndpointDiscovery discovery;
+        private readonly string consulNodeIp;
 
-        readonly string consulNodeIp;
-
-        public ConsulRegistrationService(ConsulClient client)
+        public ConsulRegistrationService(ConsulClient client, IEndpointDiscovery discovery)
         {
-            if (ReferenceEquals(null, client) == true) throw new ArgumentNullException(nameof(client));
+            if (client is null) throw new ArgumentNullException(nameof(client));
             this.client = client;
 
             this.consulNodeIp = GetCurrentNodeIp();
-            if (string.IsNullOrEmpty(consulNodeIp) == true) throw new ArgumentNullException(nameof(consulNodeIp));
+            if (string.IsNullOrEmpty(consulNodeIp)) throw new ArgumentNullException(nameof(consulNodeIp));
+
+            if (discovery is null) throw new ArgumentNullException(nameof(discovery));
+            this.discovery = discovery;
         }
 
-        public void RegisterServices(IEnumerable<DiscoverableEndpoint> endpoints)
+        [Obsolete]
+        public ConsulRegistrationService(ConsulClient client)
         {
-            foreach (var endpoint in endpoints)
+            if (client is null) throw new ArgumentNullException(nameof(client));
+            this.client = client;
+
+            this.consulNodeIp = GetCurrentNodeIp();
+            if (string.IsNullOrEmpty(consulNodeIp)) throw new ArgumentNullException(nameof(consulNodeIp));
+        }
+
+        public async Task RegisterDiscoveredEndpointsAsync()
+        {
+            foreach (var endpoint in discovery.Discover())
             {
-                AppendToConsul(endpoint);
+                await AppendToConsulAsync(endpoint).ConfigureAwait(false);
             }
         }
 
-        public void RegisterService(DiscoverableEndpoint endpoint, Uri httpCheckUri = null)
+        [Obsolete]
+        public async Task RegisterServicesAsync(IEnumerable<DiscoverableEndpoint> endpoints)
         {
-            AppendToConsul(endpoint, httpCheckUri);
+            foreach (var endpoint in endpoints)
+            {
+                await AppendToConsulAsync(endpoint).ConfigureAwait(false);
+            }
         }
 
-        public void RegisterService(string serviceName, Uri httpCheckUri)
+        [Obsolete]
+        public Task RegisterServiceAsync(DiscoverableEndpoint endpoint, Uri httpCheckUri = null)
+        {
+            return AppendToConsulAsync(endpoint, httpCheckUri);
+        }
+
+        [Obsolete]
+        public async Task RegisterServiceAsync(string serviceName, Uri httpCheckUri)
         {
             var registration = new AgentServiceRegistration()
             {
@@ -43,13 +68,13 @@ namespace Elders.Discovery.Consul
                 Check = DefaultCheck(httpCheckUri)
             };
 
-            var unRegister = client.Agent.ServiceDeregister(registration.ID).Result;
-            var register = client.Agent.ServiceRegister(registration).Result;
+            var unRegister = await client.Agent.ServiceDeregister(registration.ID).ConfigureAwait(false);
+            var register = await client.Agent.ServiceRegister(registration).ConfigureAwait(false);
         }
 
-        public void UnRegisterServices(string boundedContext)
+        public async Task UnRegisterServicesAsync(string boundedContext)
         {
-            var services = client.Agent.Services().Result;
+            var services = await client.Agent.Services().ConfigureAwait(false);
 
             foreach (var service in services.Response)
             {
@@ -57,17 +82,17 @@ namespace Elders.Discovery.Consul
                 {
                     var parsed = ConsulHelper.Parse(service.Value.Tags);
                     if (parsed.ContainsKey(ConsulHelper.BoundedContext) == true && parsed[ConsulHelper.BoundedContext] == boundedContext)
-                        client.Agent.ServiceDeregister(service.Key);
+                        await client.Agent.ServiceDeregister(service.Key).ConfigureAwait(false);
                 }
             }
         }
 
-        AgentServiceCheck DefaultCheck(Uri httpCheckUri)
+        private AgentServiceCheck DefaultCheck(Uri httpCheckUri)
         {
             return new AgentServiceCheck { Interval = TimeSpan.FromMinutes(5), HTTP = httpCheckUri.ToString(), Timeout = TimeSpan.FromMinutes(1) };
         }
 
-        void AppendToConsul(DiscoverableEndpoint endpoint, Uri httpCheckUri = null)
+        private Task AppendToConsulAsync(DiscoverableEndpoint endpoint, Uri httpCheckUri = null)
         {
             var bcTag = $"{ConsulHelper.BoundedContext}{ConsulHelper.Separator}{endpoint.BoundedContext}";
             var publicTag = $"{ConsulHelper.Visability}{ConsulHelper.Separator}public";
@@ -86,7 +111,7 @@ namespace Elders.Discovery.Consul
             if (ReferenceEquals(null, httpCheckUri) == false)
                 check = DefaultCheck(httpCheckUri);
 
-            AppendToConsul(id, name, tags, check);
+            return AppendToConsulAsync(id, name, tags, check);
 
         }
 
@@ -110,7 +135,7 @@ namespace Elders.Discovery.Consul
             return false;
         }
 
-        void AppendToConsul(string id, string name, string[] tags, AgentServiceCheck check = null)
+        private async Task AppendToConsulAsync(string id, string name, string[] tags, AgentServiceCheck check = null)
         {
             DiscoverableEndpoint newEndpoint = tags.ConvertConsulTagsToDiscoveryEndpoint();
             bool isNewOrUpdatedService = IsNewOrUpdatedService(newEndpoint);
@@ -127,17 +152,12 @@ namespace Elders.Discovery.Consul
                 };
 
                 // this will clean old registrations
-                var unRegister = client.Agent.ServiceDeregister(registration.ID).Result;
-                var register = client.Agent.ServiceRegister(registration).Result;
-                //var result = client.Catalog.Services().Result;
-                //foreach (var item in result.Response)
-                //{
-                //    client.Agent.ServiceDeregister(item.Key);
-                //}
+                var unRegister = await client.Agent.ServiceDeregister(registration.ID).ConfigureAwait(false);
+                var register = await client.Agent.ServiceRegister(registration).ConfigureAwait(false);
             }
         }
 
-        string GetCurrentNodeIp()
+        private string GetCurrentNodeIp()
         {
             var self = client.Agent.Self().Result;
             if (ReferenceEquals(null, self) == true) return string.Empty;
