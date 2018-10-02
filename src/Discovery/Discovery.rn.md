@@ -3,6 +3,7 @@
 
 
 
+
 #### 0.2.4 - 16.05.2018
 * Better encapsulation and object oriented code
 
