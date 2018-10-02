@@ -115,15 +115,15 @@ namespace Elders.Discovery.Consul
 
         }
 
-        private bool IsNewOrUpdatedService(DiscoverableEndpoint newEndpoint)
+        private async Task<bool> IsNewOrUpdatedServiceAsync(DiscoverableEndpoint newEndpoint)
         {
-            var result = client.Catalog.Service(newEndpoint.FullName).Result;
+            var result = await client.Catalog.Service(newEndpoint.FullName).ConfigureAwait(false);
 
-            if (ReferenceEquals(result, null)) return false;
+            if (result is null) return false;
             if (result.StatusCode != System.Net.HttpStatusCode.OK) return false;
 
             CatalogService[] currentServices = result.Response;
-            if (ReferenceEquals(currentServices, null) || currentServices.Length == 0) return true;
+            if (currentServices is null || currentServices.Length == 0) return true;
 
             foreach (var currentService in currentServices)
             {
@@ -138,7 +138,7 @@ namespace Elders.Discovery.Consul
         private async Task AppendToConsulAsync(string id, string name, string[] tags, AgentServiceCheck check = null)
         {
             DiscoverableEndpoint newEndpoint = tags.ConvertConsulTagsToDiscoveryEndpoint();
-            bool isNewOrUpdatedService = IsNewOrUpdatedService(newEndpoint);
+            bool isNewOrUpdatedService = await IsNewOrUpdatedServiceAsync(newEndpoint).ConfigureAwait(false);
             if (isNewOrUpdatedService)
             {
                 check = null; // Removes all health checks for now... too much noise
