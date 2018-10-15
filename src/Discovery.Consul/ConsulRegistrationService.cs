@@ -105,19 +105,19 @@ namespace Discovery.Consul
 
         private bool IsNewOrUpdatedService(DiscoverableEndpoint newEndpoint)
         {
-            var response = client.Catalog.Service(newEndpoint.FullName).Result;
-            if (ReferenceEquals(null, response) == false && response.StatusCode == System.Net.HttpStatusCode.OK)
+            var result = client.Catalog.Service(newEndpoint.FullName).Result;
+
+            if (ReferenceEquals(result, null)) return false;
+            if (result.StatusCode != System.Net.HttpStatusCode.OK) return false;
+
+            CatalogService[] currentServices = result.Response;
+            if (ReferenceEquals(currentServices, null) || currentServices.Length == 0) return true;
+
+            foreach (var currentService in currentServices)
             {
-                CatalogService[] currentServices = response.Response;
-                if (ReferenceEquals(null, currentServices) == false)
-                {
-                    foreach (var currentService in currentServices)
-                    {
-                        DiscoverableEndpoint endpointInConsul = currentService.ServiceTags.ConvertConsulTagsToDiscoveryEndpoint();
-                        if (newEndpoint.Equals(endpointInConsul) == false)
-                            return true;
-                    }
-                }
+                DiscoverableEndpoint endpointInConsul = currentService.ServiceTags.ConvertConsulTagsToDiscoveryEndpoint();
+                if (newEndpoint.Equals(endpointInConsul) == false)
+                    return true;
             }
 
             return false;
