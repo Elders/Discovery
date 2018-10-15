@@ -1,3 +1,6 @@
+#### 0.2.5 - 15.10.2018
+* Synchronizes version with Discovery.Consul
+
 #### 0.2.4 - 16.05.2018
 * Better encapsulation and object oriented code
 
