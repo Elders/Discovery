@@ -10,15 +10,15 @@ namespace Elders.Discovery.Consul
     {
         private readonly ConsulClient client;
         private readonly IEndpointDiscovery discovery;
-        private readonly string consulNodeIp;
+        private readonly string consulNodeAddress;
 
         public ConsulRegistrationService(ConsulClient client, IEndpointDiscovery discovery)
         {
             if (client is null) throw new ArgumentNullException(nameof(client));
             this.client = client;
 
-            this.consulNodeIp = GetCurrentNodeIp();
-            if (string.IsNullOrEmpty(consulNodeIp)) throw new ArgumentNullException(nameof(consulNodeIp));
+            this.consulNodeAddress = GetCurrentNodeAddress();
+            if (string.IsNullOrEmpty(consulNodeAddress)) throw new ArgumentNullException(nameof(consulNodeAddress));
 
             if (discovery is null) throw new ArgumentNullException(nameof(discovery));
             this.discovery = discovery;
@@ -30,8 +30,7 @@ namespace Elders.Discovery.Consul
             if (client is null) throw new ArgumentNullException(nameof(client));
             this.client = client;
 
-            this.consulNodeIp = GetCurrentNodeIp();
-            if (string.IsNullOrEmpty(consulNodeIp)) throw new ArgumentNullException(nameof(consulNodeIp));
+            if (string.IsNullOrEmpty(consulNodeAddress)) throw new ArgumentNullException(nameof(consulNodeAddress));
         }
 
         public async Task RegisterDiscoveredEndpointsAsync()
@@ -64,7 +63,7 @@ namespace Elders.Discovery.Consul
             {
                 ID = serviceName,
                 Name = serviceName,
-                Address = consulNodeIp,
+                Address = consulNodeAddress,
                 Check = DefaultCheck(httpCheckUri)
             };
 
@@ -146,7 +145,7 @@ namespace Elders.Discovery.Consul
                 {
                     ID = id,
                     Name = name,
-                    Address = consulNodeIp,
+                    Address = consulNodeAddress,
                     Tags = tags,
                     Check = check
                 };
@@ -157,8 +156,11 @@ namespace Elders.Discovery.Consul
             }
         }
 
-        private string GetCurrentNodeIp()
+        private string GetCurrentNodeAddress()
         {
+            if (client.Config?.Address is null == false)
+                return client.Config.Address.AbsoluteUri;
+
             var self = client.Agent.Self().Result;
             if (ReferenceEquals(null, self) == true) return string.Empty;
 
