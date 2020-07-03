@@ -151,8 +151,8 @@ namespace Elders.Discovery.Consul
                 };
 
                 // this will clean old registrations
-                var unRegister = await client.Agent.ServiceDeregister(registration.ID).ConfigureAwait(false);
-                var register = await client.Agent.ServiceRegister(registration).ConfigureAwait(false);
+                await client.Agent.ServiceDeregister(registration.ID).ConfigureAwait(false);
+                await client.Agent.ServiceRegister(registration).ConfigureAwait(false);
             }
         }
 

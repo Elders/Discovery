@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <!--Nuget-->
@@ -21,26 +21,6 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <RootNamespace>Elders.Discovery.Consul</RootNamespace>
   </PropertyGroup>
-
-  <!--netstandard2.0-->
-  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
-    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-  </ItemGroup>
-
-  <!--net472-->
-  <PropertyGroup Condition="'$(TargetFramework)'=='net472'">
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net472'">
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="netstandard" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Consul" Version="0.7.2.6" />
