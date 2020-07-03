@@ -1,8 +1,20 @@
+#### 1.0.0-beta0005 - 03.07.2020
+* Updates to dotnet core 3.1
+
+#### 1.0.0-beta0004 - 02.10.2018
+* Fixes a bug when chacking for service changes
+
+#### 1.0.0-beta0003 - 02.10.2018
+* Stops hiding the async methods
+
+#### 1.0.0-beta0002 - 01.10.2018
+* Adds async versions of the Consul Get methods.
+
+#### 1.0.0-beta0001 - 01.10.2018
+* Removes ASP net dependency
+
 #### 0.2.5 - 15.10.2018
 * Fixes internal behaviour of ConsulRegistrationService
-
-
-
 
 #### 0.2.4 - 21.05.2018
 * Properly calculates UpdatedAt field when getting all services

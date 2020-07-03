@@ -1,8 +1,20 @@
+#### 1.0.0-beta0005 - 03.07.2020
+* Updates to dotnet core 3.1
+
+#### 1.0.0-beta0004 - 02.10.2018
+* Bump
+
+#### 1.0.0-beta0003 - 02.10.2018
+* Adds IEndpointDiscovery interface
+
+#### 1.0.0-beta0002 - 01.10.2018
+* Renames DiscoveryReaderResponseModel to DiscoveryResponse
+
+#### 1.0.0-beta0001 - 01.10.2018
+* Removes ASP net dependency
+
 #### 0.2.5 - 15.10.2018
 * Synchronizes version with Discovery.Consul
-
-
-
 
 #### 0.2.4 - 16.05.2018
 * Better encapsulation and object oriented code
