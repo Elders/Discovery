@@ -9,7 +9,7 @@ module.exports={
               "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES", "BREAKING"]
           }
       }],
-  
+
       ["@semantic-release/exec",{
           prepareCmd: `
               set -e
@@ -22,12 +22,12 @@ module.exports={
               echo "##vso[task.setvariable variable=newVer;]yes"
           `,
       }],
-  
+
       "@semantic-release/release-notes-generator",
       "@semantic-release/changelog",
       "@semantic-release/git"
     ],
-  
+
     branches: [
       'master',
       {name: 'beta', channel: 'beta', prerelease: true},

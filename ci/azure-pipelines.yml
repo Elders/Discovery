@@ -1,6 +1,6 @@
 ---
 variables:
-    PROJECT_DIR: Elders.Discovery
+    PROJECT_DIR: Discovery.Consul
 
 trigger:
     branches:
