@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discovery", "Discovery\Discovery.csproj", "{843A8344-3784-49D5-B4C7-F213DB6D71BE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discovery.Consul", "Discovery.Consul\Discovery.Consul.csproj", "{F8AA66C6-FF26-4E52-BD5A-6E4DC92A7D10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discovery.Tests", "Discovery.Tests\Discovery.Tests.csproj", "{15270C0C-EC2D-445D-979B-4CE82B12839C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discovery.Tests", "Discovery.Tests\Discovery.Tests.csproj", "{15270C0C-EC2D-445D-979B-4CE82B12839C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
