@@ -6,38 +6,58 @@
   <!--Nuget-->
   <PropertyGroup>
     <PackageId>Discovery.Consul</PackageId>
-    <Product>Discovery</Product>
-    <Title>Discovery</Title>
-    <Authors>Elders OSS</Authors>
-    <Copyright>Copyright © Elders OSS 2013</Copyright>
+    
+    <Product>Discovery.Consul</Product>
+    <Title>Discovery.Consul</Title>
     <Description>Discovery</Description>
     <PackageTags>discovery</PackageTags>
-    <PackageLicenseUrl>https://github.com/Elders/Discovery/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/Elders/Discovery</PackageProjectUrl>
+    
+    <Authors>Elders OSS</Authors>
+    <Copyright>Copyright © Elders OSS 2013-2022</Copyright>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <RequireLicenseAcceptance>true</RequireLicenseAcceptance>
+
+    <ReleaseNotes>https://github.com/Elders/Discovery/src/Discovery.Consul/Discovery.Consul.rn.md</ReleaseNotes>
+
     <RepositoryUrl>https://github.com/Elders/Discovery.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Elders/Discovery</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    
     <AssemblyName>Elders.Discovery.Consul</AssemblyName>
-    <NeutralLanguage>en-US</NeutralLanguage>
     <RootNamespace>Elders.Discovery.Consul</RootNamespace>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <AssemblyVersion>8.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Consul" Version="1.6.10.7" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Discovery\Discovery.csproj" />
+    <ProjectReference Include="..\Discovery\Discovery.csproj">
+      <PrivateAssets>All</PrivateAssets>
+    </ProjectReference>
   </ItemGroup>
 
+  <!-- copied from: https://josef.codes/dotnet-pack-include-referenced-projects/ -->
   <PropertyGroup>
-    <DebugType>portable</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <EmbedSources>true</EmbedSources>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.3" PrivateAssets="all">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
+    <ItemGroup>
+      <!-- Filter out unnecessary files -->
+      <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->WithMetadataValue('PrivateAssets', 'All'))"/>
+    </ItemGroup>
+
+    <!-- Print batches for debug purposes -->
+    <Message Text="Batch for .nupkg: ReferenceCopyLocalPaths = @(_ReferenceCopyLocalPaths), ReferenceCopyLocalPaths.DestinationSubDirectory = %(_ReferenceCopyLocalPaths.DestinationSubDirectory) Filename = %(_ReferenceCopyLocalPaths.Filename) Extension = %(_ReferenceCopyLocalPaths.Extension)" Importance="High" Condition="'@(_ReferenceCopyLocalPaths)' != ''" />
+
+    <ItemGroup>
+      <!-- Add file to package with consideration of sub folder. If empty, the root folder is chosen. -->
+      <BuildOutputInPackage Include="@(_ReferenceCopyLocalPaths)" TargetPath="%(_ReferenceCopyLocalPaths.DestinationSubDirectory)"/>
+    </ItemGroup>
+  </Target>
+
 </Project>
